@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TimeMachineEntry index{% endblock %}
+
+{% block body %}
+    <h1>TimeMachineEntry index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>ResourceURL</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for time_machine_entry in time_machine_entries %}
+            <tr>
+                <td>{{ time_machine_entry.id }}</td>
+                <td>{{ time_machine_entry.name }}</td>
+                <td>{{ time_machine_entry.resourceURL }}</td>
+                <td>
+                    <a href="{{ path('app_time_machine_entry_show', {'id': time_machine_entry.id}) }}">show</a>
+                    <a href="{{ path('app_time_machine_entry_edit', {'id': time_machine_entry.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_time_machine_entry_new') }}">Create new</a>
+{% endblock %}

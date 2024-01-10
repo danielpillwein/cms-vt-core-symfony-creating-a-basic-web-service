@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TimeMachineEntry index{% endblock %}
+
+{% block body %}
+    <h1>TimeMachineEntry index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>ResourceURL</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ time_machine_entry.id }}</td>
+                <td>{{ time_machine_entry.name }}</td>
+                <td>{{ time_machine_entry.resourceURL }}</td>
+            </tr>
+        </tbody>
+    </table>
+{% endblock %}

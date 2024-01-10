@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 
 #[Route('/time/machine/entry')]
 class TimeMachineEntryController extends AbstractController
@@ -35,13 +36,11 @@ class TimeMachineEntryController extends AbstractController
     }
 
     #[Route('/new', name: 'app_time_machine_entry_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): Response
     {
         $timeMachineEntry = new TimeMachineEntry();
         $form = $this->createForm(TimeMachineEntryType::class, $timeMachineEntry);
         $form->handleRequest($request);
-
-
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($timeMachineEntry);
@@ -50,35 +49,21 @@ class TimeMachineEntryController extends AbstractController
             return $this->redirectToRoute('app_time_machine_entry_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        // Handle JSON submission
-        $json = $this->getJson($request);
-        if ($json !== null) {
-            $form2 = $this->createForm(TimeMachineEntryType::class, $timeMachineEntry);
-            $form2->submit($json);
+        $json = json_decode($request->getContent(), true);
+        if ($json !== null){
+            $timeMachineEntry->setName($json['name']);
+            $timeMachineEntry->setResourceURL($json['resource_url']);
+            $entityManager->persist($timeMachineEntry);
+            $entityManager->flush();
 
-            if ($form2->isValid()) {
-                $entityManager->persist($timeMachineEntry);
-                $entityManager->flush();
 
-                return $this->json(['message' => 'Time machine entry created successfully'], Response::HTTP_CREATED);
-            }
+            return $this->redirectToRoute('app_time_machine_entry_index');
         }
 
         return $this->render('time_machine_entry/new.html.twig', [
             'time_machine_entry' => $timeMachineEntry,
             'form' => $form,
         ]);
-    }
-
-    private function getJson(Request $request)
-    {
-        $data = json_decode($request->getContent(), true);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return null;
-        }
-
-        return $data;
     }
 
     #[Route('/{id}', name: 'app_time_machine_entry_show', methods: ['GET'])]
